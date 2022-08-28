@@ -8,8 +8,11 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^16.0.1",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
+    "file-system": "^2.2.2",
+    "fs": "^0.0.1-security",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1"
   }
