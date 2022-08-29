@@ -4,7 +4,16 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var { readdirSync, readdir } = require('file-system');
+var noBots = require('express-nobots');
+var session = require('express-session');
+var csrfProtection = csrf({ cookie: true })
 require('dotenv').config();
+
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'tutaj tez zmien',
+  name: 'zmiento'
+}))
 
 debug = (process.env.VERSION === 'STAGE') ? function() {} : console.log;
 
@@ -21,9 +30,12 @@ app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
+
+app.use(noBots({block:true}));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.disable('x-powered-by');
 
 console.log('\n')
 
