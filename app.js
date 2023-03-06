@@ -6,14 +6,9 @@ var logger = require('morgan');
 var { readdirSync, readdir } = require('file-system');
 var noBots = require('express-nobots');
 var session = require('express-session');
+const csrf = require('csurf');
 var csrfProtection = csrf({ cookie: true })
 require('dotenv').config();
-
-app.set('trust proxy', 1) // trust first proxy
-app.use(session({
-  secret: 'tutaj tez zmien',
-  name: 'zmiento'
-}))
 
 debug = (process.env.VERSION === 'STAGE') ? function() {} : console.log;
 
@@ -23,6 +18,8 @@ debug = (process.env.VERSION === 'STAGE') ? function() {} : console.log;
 
 
 var app = express();
+
+app.set('trust proxy', 1) // trust first proxy
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -39,7 +36,7 @@ app.disable('x-powered-by');
 
 console.log('\n')
 
-readdirSync('./routes').forEach(function(file, index, array) {
+readdirSync(path.join(__dirname, 'routes')).forEach(function(file, index, array) {
   if (file.split('.')[1] === 'js' ) {
     let siteFile = require('./routes/' + file.split('.')[0]);
 
@@ -51,14 +48,14 @@ readdirSync('./routes').forEach(function(file, index, array) {
       debug('Loading site: /' + file.split('.')[0] + ' from file: ' + file);
     }
   } else if (!file.split('.')[1]) {
-    let files = readdirSync('./routes/' + file);
+    let files = readdirSync(path.join(__dirname, 'routes/' + file));
     if (files.find(r => r === 'data.js')) {
       let dataFile = require('./routes/' + file.split('.')[0] + '/data');
-      if (dataFile.url) {
+      // if (dataFile.url) {
         if (dataFile.mainFile) {
           let mainFile = require('./routes/' + file.split('.')[0] + '/' + dataFile.mainFile.split('.')[0]);
           if (mainFile.length > 0) {
-            app.use(dataFile.url, mainFile);
+            app.use('/' + file.split('.')[0], mainFile);
             dataFile.loadOtherFiles(mainFile);
             debug('Loading site: ' + dataFile.url + ' from file: /routes/' + file.split('.')[0] + '/' + dataFile.mainFile);
           } else {
@@ -67,9 +64,9 @@ readdirSync('./routes').forEach(function(file, index, array) {
         } else {
           debug('Error loading mainFile from /routes/' + file.split('.')[0] + '/data.js');
         }
-      } else {
-        debug('Error loading url from /routes/' + file.split('.')[0] + '/data.js');
-      }
+      // } else {
+      //   debug('Error loading url from /routes/' + file.split('.')[0] + '/data.js');
+      // }
     } else {
       debug('Error loading file: /routes/' + file + '/data.js - no data.js file found');
     }

@@ -4,7 +4,11 @@ var router = express.Router();
 /* GET users listing. */
 
 router.get('/', function(req, res, next) {
-    res.send('example main site');
+    res.json({
+        "info": "API for Xeon Client by Tomci0",
+        "copyright": "Copyright Tomci0 © 2022",
+        "version": process.env.VERSION
+    });
 });
 
 module.exports = router;
